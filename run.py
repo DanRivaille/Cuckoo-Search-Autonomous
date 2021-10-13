@@ -1,6 +1,5 @@
 from cso import CSO
 from cec2013lsgo.cec2013 import Benchmark
-from fitness import fitness_1
 
 bench = Benchmark()
 
