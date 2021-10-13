@@ -8,6 +8,7 @@ def main():
     num_function = 2
 
     info = bench.get_info(num_function)
+    BKS = info['best']
     Lower = info['lower']
     Upper = info['upper']
     D = info['dimension']
@@ -17,8 +18,8 @@ def main():
     N_Gen = 1500
     ObjetiveFunction = bench.get_function(num_function)
 
-    cuckoo = CSO(ObjetiveFunction, NP, D, pa, beta, Lower, Upper, N_Gen)
-    cuckoo.execute()
+    cuckoo = CSO(ObjetiveFunction, NP, D, pa, beta, Lower, Upper, N_Gen, 0, BKS)
+    cuckoo.execute(num_function)
 
 
 def handle_args():

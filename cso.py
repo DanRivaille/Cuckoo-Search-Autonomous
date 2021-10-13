@@ -1,21 +1,17 @@
-import numpy as np
+import time
+import csv
 from math import gamma
+import numpy as np
 
 np.random.seed(1)       # Just for debug
 
 class CSO:
-    def __init__(self, function, NP, D, pa, beta, Lower, Upper, N_Gen):
-        '''
-        PARAMETERS:
-        function: Objective function
-        NP: Population size
-        D: Total dimensions
-        pa: Assigned probability
-        beta: Levy parameter
-        Lower: Lower bound
-        Upper: Upper bound
-        N_Gen: Maximum iterations
-        '''
+    def __init__(self, function, NP, D, pa, beta, Lower, Upper, N_Gen, ejecution, BKS):
+        self.ejecution = ejecution
+        self.BKS = BKS
+        self.seed = int(time.time())
+
+        # MH params
         self.function = function
         self.NP = NP 
         self.D = D
@@ -27,8 +23,12 @@ class CSO:
 
         self.X = []
 
+    def init_cuckoo(self):
+        '''
+        Initialize the variables of Cuckoo Search
+        '''
         for i in range(self.D):
-            x = (self.Upper - self.Lower) * np.random.rand(NP,) + self.Lower 
+            x = (self.Upper - self.Lower) * np.random.rand(self.NP,) + self.Lower 
             self.X.append(x)
 
         self.X = np.array(self.X).T.copy()
@@ -85,21 +85,35 @@ class CSO:
         for i in range(self.D):
             self.X[:,i] = np.clip(self.X[:,i], self.Lower, self.Upper)
 
-    def execute(self):
+    def execute(self, n_fun, name_logs_file='logs.csv', interval_logs=100):
         '''
         Execute the Cuckoo Search Algorithm
         '''
-        for t in range(self.N_Gen):
-            self.update_position_1()
-            self.clip_X()       # Apply bounds
-            self.update_position_2()
-            self.clip_X()       # Apply bounds
+        self.init_cuckoo()
 
-            if (t % 100) == 0:
-                print(t)
-                print(self.best[:10])
-                print(self.function(self.best))
-                print()
+        with open(name_logs_file, mode='w') as logs_file:
+            initial_time = time.perf_counter()
+            logs_writter = csv.writer(logs_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            logs_writter.writerow('function,ejecution,iteration,D,NP,N_Gen,pa,beta,lower,upper,time_ms,seed,BKS,fitness'.split(','))
+
+            # Meteheuristic
+            for t in range(self.N_Gen):
+                if (t % 100) == 0:
+                    # Logs purposes
+                    MH_params = f'{self.D},{self.NP},{self.N_Gen},{self.pa}'
+                    MH_params += f',{self.Lower},{self.Upper}'
+
+                    #current_time = parseSeconds(time.perf_counter() - initial_time)
+                    current_time = 0
+                    log = f'{n_fun},{self.ejecution},{t},{MH_params},{current_time},{self.seed},{self.BKS},"fmin"'
+                    logs_writter.writerow(log.split(','))
+                    print('\n' + log)
+
+                self.update_position_1()
+                self.clip_X()       # Apply bounds
+                self.update_position_2()
+                self.clip_X()       # Apply bounds
+
 
         print('\nOPTIMUM SOLUTION\n  >', np.round(self.best.reshape(-1),7).tolist())
         print('\nOPTIMUM FITNESS\n  >', np.round(self.function(self.best),7))
