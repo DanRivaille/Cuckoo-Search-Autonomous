@@ -116,10 +116,5 @@ class CSO:
                 self.clip_X()       # Apply bounds
 
 
-        print('\nOPTIMUM SOLUTION\n  >', np.round(self.best.reshape(-1),7).tolist())
-        print('\nOPTIMUM FITNESS\n  >', np.round(self.F_min,7))
-        print()
-
         return self.best, self.F_min
-
 
