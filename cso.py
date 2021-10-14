@@ -4,8 +4,6 @@ from math import gamma
 import numpy as np
 from scripts.utils import parseSeconds
 
-np.random.seed(1)       # Just for debug
-
 class CSO:
     def __init__(self, function, NP, D, pa, beta, Lower, Upper, N_Gen, ejecution, BKS):
         self.ejecution = ejecution
