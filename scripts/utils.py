@@ -58,3 +58,4 @@ def clusterize_solutions(sols, min_samp):
   model = DBSCAN(eps=epsilon, min_samples=min_samp)
   clusters = model.fit(X=sols)
   return clusters
+

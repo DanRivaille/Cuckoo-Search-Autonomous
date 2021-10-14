@@ -2,6 +2,7 @@ import time
 import csv
 from math import gamma
 import numpy as np
+from scripts.utils import parse_seconds
 
 np.random.seed(1)       # Just for debug
 
@@ -108,8 +109,7 @@ class CSO:
                     MH_params = f'{self.D},{self.NP},{self.N_Gen},{self.pa}'
                     MH_params += f',{self.Lower},{self.Upper}'
 
-                    #current_time = parseSeconds(time.perf_counter() - initial_time)
-                    current_time = 0
+                    current_time = parseSeconds(time.perf_counter() - initial_time)
                     log = f'{n_fun},{self.ejecution},{t},{MH_params},{current_time},{self.seed},{self.BKS},"fmin"'
                     logs_writter.writerow(log.split(','))
                     print('\n' + log)
