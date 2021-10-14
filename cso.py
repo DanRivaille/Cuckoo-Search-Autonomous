@@ -2,7 +2,7 @@ import time
 import csv
 from math import gamma
 import numpy as np
-from scripts.utils import parse_seconds
+from scripts.utils import parseSeconds
 
 np.random.seed(1)       # Just for debug
 
@@ -106,11 +106,11 @@ class CSO:
             for t in range(self.N_Gen):
                 if (t % 100) == 0:
                     # Logs purposes
-                    MH_params = f'{self.D},{self.NP},{self.N_Gen},{self.pa}'
+                    MH_params = f'{self.D},{self.NP},{self.N_Gen},{self.pa},{self.beta}'
                     MH_params += f',{self.Lower},{self.Upper}'
 
                     current_time = parseSeconds(time.perf_counter() - initial_time)
-                    log = f'{n_fun},{self.ejecution},{t},{MH_params},{current_time},{self.seed},{self.BKS},"fmin"'
+                    log = f'{n_fun},{self.ejecution},{t},{MH_params},{current_time},{self.seed},{self.BKS},"{self.F_min}"'
                     logs_writter.writerow(log.split(','))
                     print('\n' + log)
 
