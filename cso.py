@@ -20,6 +20,7 @@ class CSO:
         self.beta = beta
         self.Lower = Lower
         self.Upper = Upper
+        self.F_min = 0
 
         self.X = []
 
@@ -32,6 +33,8 @@ class CSO:
             self.X.append(x)
 
         self.X = np.array(self.X).T.copy()
+        self.best = self.X[0, :].copy()
+        self.F_min = self.function(self.best)
 
     def update_position_1(self):
         '''
@@ -73,8 +76,10 @@ class CSO:
         '''
         Compare particle's current position with global best position
         '''
-        if self.function(best) > self.function(particle_x):
+        particle_fitness = self.function(particle_x)
+        if self.F_min > particle_fitness:
             best = particle_x.copy()
+            self.F_min = particle_fitness
 
         return best
 
@@ -116,9 +121,9 @@ class CSO:
 
 
         print('\nOPTIMUM SOLUTION\n  >', np.round(self.best.reshape(-1),7).tolist())
-        print('\nOPTIMUM FITNESS\n  >', np.round(self.function(self.best),7))
+        print('\nOPTIMUM FITNESS\n  >', np.round(self.F_min,7))
         print()
 
-        return self.best, self.function(self.best)
+        return self.best, self.F_min
 
 
