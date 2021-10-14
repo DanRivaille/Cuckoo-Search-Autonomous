@@ -47,10 +47,10 @@ class CSO:
         v = np.random.normal(0, σv, self.D)
         S = u/(np.abs(v)**(1/self.beta))
 
-        self.best = self.X[0,:].copy()
-
         for i in range(1, self.NP):
             self.best = self.optimum(self.best, self.X[i,:])
+
+        self.F_min = self.function(self.best)
 
         Xnew = self.X.copy()
         for i in range(self.NP):
@@ -75,10 +75,8 @@ class CSO:
         '''
         Compare particle's current position with global best position
         '''
-        particle_fitness = self.function(particle_x)
-        if self.F_min > particle_fitness:
+        if self.function(best) > self.function(particle_x):
             best = particle_x.copy()
-            self.F_min = particle_fitness
 
         return best
 
