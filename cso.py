@@ -2,7 +2,14 @@ import time
 import csv
 from math import gamma
 import numpy as np
-from scripts.utils import parseSeconds
+from scripts.utils import *
+
+MAX_NEST = 100
+MIN_NEST = 10
+INCREMENTS_NEST = 2
+INCREMENTS_NEST_PER_CLUSTER = 2         # Cantidad de nidos a agregar por cluster
+IMPROVE_PERCENTAGE_ACCEPTED = 10        # Porcentaje de mejora aceptado para aplicar el autonomo
+DIFF_CLUSTER_PERCENTAGE_ACCEPTED = 5    # Diferencia porcentual aceptado para clusters juntos
 
 class CSO:
     def __init__(self, function, NP, D, pa, beta, Lower, Upper, N_Gen, ejecution, BKS):
