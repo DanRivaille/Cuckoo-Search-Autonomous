@@ -178,7 +178,6 @@ class CSO:
         Initialize the variables of Cuckoo Search
         '''
         np.random.seed(self.seed)
-        np.random.seed(0)       # For debug
 
         for i in range(self.NP):
             x = (self.Upper - self.Lower) * np.random.rand(self.D,) + self.Lower

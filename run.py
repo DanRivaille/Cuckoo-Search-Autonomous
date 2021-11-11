@@ -23,7 +23,7 @@ def main():
             NP = 30
             pa = 0.25
             beta = 1.5
-            N_Gen = 1000
+            N_Gen = 2500
             ObjetiveFunction = bench.get_function(num_function)
 
             cuckoo = CSO(ObjetiveFunction, NP, D, pa, beta, Lower, Upper, N_Gen, ejecution, BKS)
