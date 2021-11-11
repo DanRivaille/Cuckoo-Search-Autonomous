@@ -253,7 +253,7 @@ class CSO:
         with open(name_logs_file, mode='w') as logs_file:
             initial_time = time.perf_counter()
             logs_writter = csv.writer(logs_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-            logs_writter.writerow('function,ejecution,iteration,D,NP,N_Gen,pa,beta,lower,upper,time_ms,seed,BKS,fitness'.split(','))
+            logs_writter.writerow('function,ejecution,iteration,D,NP,N_Gen,pa,beta,lower,upper,time_ms,seed,BKS,fitness,%improvement'.split(','))
 
             # Meteheuristic
             for t in range(self.N_Gen):
@@ -265,9 +265,8 @@ class CSO:
                     # Logs purposes
                     MH_params = f'{self.D},{self.NP},{self.N_Gen},{self.pa},{self.beta}'
                     MH_params += f',{self.Lower},{self.Upper}'
-
                     current_time = parseSeconds(time.perf_counter() - initial_time)
-                    log = f'{n_fun},{self.ejecution},{t},{MH_params},{current_time},{self.seed},{self.BKS},"{self.F_min}"'
+                    log = f'{n_fun},{self.ejecution},{t},{MH_params},{current_time},{self.seed},{self.BKS},"{self.F_min}","{self.improve_percentage}"'
                     logs_writter.writerow(log.split(','))
                     print('\n' + log)
 
