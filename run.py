@@ -2,6 +2,8 @@ import sys
 from cec2013lsgo.cec2013 import Benchmark
 from cso import CSO
 
+ORIGINAL_MH = True
+
 INITIAL_FUNCTION = 1
 LAST_FUNCTION = 15
 
@@ -27,7 +29,7 @@ def main():
             ObjetiveFunction = bench.get_function(num_function)
 
             cuckoo = CSO(ObjetiveFunction, NP, D, pa, beta, Lower, Upper, N_Gen, ejecution, BKS)
-            cuckoo.execute(num_function, f'Logs/function{num_function}_{ejecution}.csv')
+            cuckoo.execute(num_function, f'Logs/function{num_function}_{ejecution}.csv', ORIGINAL_MH)
 
 
 def handle_args():
@@ -38,12 +40,15 @@ def handle_args():
     -F, --functions-range <init>:<last>  Ejecuta de la funcion 'init' hasta 'last'
     -e, --ejecution <number>             Ejecuta solo 'number' ejecuciones
     -E, --ejecutions-range <init>:<last> Ejecuta desde 'init' hasta 'last' ejecuciones
+    -A, --autonomous                     Ejecuta la metaheuristica con el autonomo
+    -O, --original                       Ejecuta la metaheuristica original
     -h                                   Muestra los comandos disponibles
     """
     global INITIAL_FUNCTION
     global LAST_FUNCTION
     global INITIAL_EJECUTION
     global LAST_EJECUTION
+    global ORIGINAL_MH
 
     cant_args = len(sys.argv)
 
@@ -80,8 +85,16 @@ def handle_args():
             help_text += "\n-F, --functions-range <init>:<last>  Ejecuta de la funcion 'init' hasta 'last'"
             help_text += "\n-e, --ejecution <number>             Ejecuta solo 'number' ejecuciones"
             help_text += "\n-E, --ejecutions-range <init>:<last> Ejecuta desde 'init' hasta 'last' ejecuciones"
+            help_text += "\n-A, --autonomous                     Ejecuta la metaheuristica con el autonomo"
+            help_text += "\n-O, --original                       Ejecuta la metaheuristica original (Opcion por defecto)"
             help_text += "\n-h                                   Muestra los comandos disponibles"
             print(help_text)
+
+        elif '-A' == current_arg or '--autonomous' == current_arg:
+            ORIGINAL_MH = False
+
+        elif '-O' == current_arg or '--original' == current_arg:
+            ORIGINAL_MH = True
 
         current_arg_index += 1
 

@@ -242,7 +242,7 @@ class CSO:
         for i in range(self.D):
             self.X[:,i] = np.clip(self.X[:,i], self.Lower, self.Upper)
 
-    def execute(self, n_fun, name_logs_file='logs.csv', interval_logs=100):
+    def execute(self, n_fun, name_logs_file='logs.csv', original_MH=True, interval_logs=100):
         '''
         Execute the Cuckoo Search Algorithm
         '''
@@ -270,9 +270,11 @@ class CSO:
                     logs_writter.writerow(log.split(','))
                     print('\n' + log)
 
-                    # Se ajusta la cantidad de soluciones dependiendo del desempeño
                     if t != 0:
-                        self.check_improve(past_best)
+                        if not original_MH:
+                            # Se ajusta la cantidad de soluciones dependiendo del desempeño
+                            self.check_improve(past_best)
+
                         past_best = self.F_min
 
                 self.update_position_1()
