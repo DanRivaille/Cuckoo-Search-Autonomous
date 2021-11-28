@@ -256,7 +256,7 @@ class CSO:
             logs_writter.writerow('function,ejecution,iteration,D,NP,N_Gen,pa,beta,lower,upper,time_ms,seed,BKS,fitness,%improvement'.split(','))
 
             # Meteheuristic
-            for t in range(self.N_Gen):
+            for t in range(self.N_Gen + 1):
                 if (t % 100) == 0:
                     # LUEGO DE ESTO, LAS LISTAS ESTAN ORDENADAS POR FITNESS
                     self.sort_by_fitness()
