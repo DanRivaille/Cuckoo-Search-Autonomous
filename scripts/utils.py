@@ -1,3 +1,4 @@
+import numpy as np
 from sklearn import cluster
 from sklearn.cluster import DBSCAN
 import math
@@ -57,5 +58,29 @@ def clusterize_solutions(sols, min_samp):
   epsilon = get_epsilon_value_knn(min_samp, sols)
   model = DBSCAN(eps=epsilon, min_samples=min_samp)
   clusters = model.fit(X=sols)
-  return clusters
+  return clusters, epsilon
+
+def getInfoClusters(labels, fitness):
+  info_clusters = {}
+
+  # Se obtienen los minimos, maximos, cantidades y sumas de cada cluster
+  for index, label in enumerate(labels):
+    if label not in info_clusters:
+      info_clusters[label] = {'min': fitness[index], 'max': fitness[index], 'quantity': 1, 'sum': fitness[index]}
+    else:
+      info_clusters[label]['quantity'] += 1
+      info_clusters[label]['sum'] += fitness[index]
+
+      if fitness[index] < info_clusters[label]['min']:
+        info_clusters[label]['min'] = fitness[index]
+
+      if fitness[index] > info_clusters[label]['max']:
+        info_clusters[label]['max'] = fitness[index]
+    
+
+  # Se calcula el promedio de los clusters
+  for label in np.unique(labels):
+    info_clusters[label]['mean'] = info_clusters[label]['sum'] / info_clusters[label]['quantity']
+
+  return info_clusters
 

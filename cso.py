@@ -12,7 +12,8 @@ IMPROVE_PERCENTAGE_ACCEPTED = 10        # Porcentaje de mejora aceptado para apl
 DIFF_CLUSTER_PERCENTAGE_ACCEPTED = 5    # Diferencia porcentual aceptado para clusters juntos
 
 class CSO:
-    def __init__(self, function, NP, D, pa, beta, Lower, Upper, N_Gen, ejecution, BKS):
+    def __init__(self, function, NP, D, pa, beta, Lower, Upper, N_Gen, num_function, ejecution, BKS):
+        self.num_function = num_function
         self.ejecution = ejecution
         self.BKS = BKS
         self.seed = int(time.time())
@@ -54,7 +55,7 @@ class CSO:
     def update_improve_percentage(self, past_best):
         self.improve_percentage = self.calculate_percentage(past_best, self.fitness[0])
 
-    def check_improve(self, past_best):
+    def check_improve(self, clusters_writter, past_best, iteration):
         global INCREMENTS_NEST
         global INCREMENTS_NEST_PER_CLUSTER
 
@@ -74,8 +75,26 @@ class CSO:
 
             new_solutions = []
 
-            clusters = clusterize_solutions(self.X, 3)
-            cant_clusters = np.unique(clusters.labels_).shape[0]
+            # Se clusterizan las soluciones
+            k = 3
+            clusters, epsilon = clusterize_solutions(self.X, k)
+            labels = clusters.labels_
+            unique_labels = np.unique(labels)
+            cant_clusters = unique_labels.shape[0]
+
+            # Se obtiene la informacion de los clusters
+            info_clusters = getInfoClusters(labels, self.fitness)
+
+            # Se guardan los logs del cluster
+            for label in unique_labels:
+                min_value = info_clusters[label]['min']
+                max_value = info_clusters[label]['max']
+                mean_cluster = info_clusters[label]['mean']
+                quantity = info_clusters[label]['quantity']
+
+                cluster_logs = f'{self.seed},{self.num_function},{self.ejecution},{iteration},{cant_clusters},{min_value},{max_value},{quantity},{mean_cluster},{epsilon},{k},{label}'
+                print(cluster_logs)
+                clusters_writter.writerow(cluster_logs.split(','))
 
             # Sino se alcanzo el limite, se incrementa la poblacion de murcielagos
             if self.NP + (cant_clusters * INCREMENTS_NEST_PER_CLUSTER) < MAX_NEST:
@@ -242,19 +261,24 @@ class CSO:
         for i in range(self.D):
             self.X[:,i] = np.clip(self.X[:,i], self.Lower, self.Upper)
 
-    def execute(self, n_fun, name_logs_file='logs.csv', original_MH=True, interval_logs=100):
+    def execute(self, name_logs_file='logs.csv', name_cluster_logs_file='clusters.csv', original_MH=True, interval_logs=100):
         '''
         Execute the Cuckoo Search Algorithm
         '''
         # Archivo de logs de la MH
         logs_file = open(name_logs_file, mode='w')
+        logs_writter = csv.writer(logs_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        logs_writter.writerow('function,ejecution,iteration,D,NP,N_Gen,pa,beta,lower,upper,time_ms,seed,BKS,fitness,%improvement'.split(','))
+
+        # Archivo de logs de los clusters
+        clusters_file = open(name_cluster_logs_file, mode='w')
+        cluster_writter = csv.writer(clusters_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        cluster_writter.writerow('seed,function,ejecution,iteration,cantClusters,min_value,max_value,cantElements,meanCluster,epsilon,k,label'.split(','))
 
         self.init_cuckoo()
         past_best = self.F_min
 
         initial_time = time.perf_counter()
-        logs_writter = csv.writer(logs_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-        logs_writter.writerow('function,ejecution,iteration,D,NP,N_Gen,pa,beta,lower,upper,time_ms,seed,BKS,fitness,%improvement'.split(','))
 
         # Meteheuristic
         for t in range(self.N_Gen + 1):
@@ -267,14 +291,14 @@ class CSO:
                 MH_params = f'{self.D},{self.NP},{self.N_Gen},{self.pa},{self.beta}'
                 MH_params += f',{self.Lower},{self.Upper}'
                 current_time = parseSeconds(time.perf_counter() - initial_time)
-                log = f'{n_fun},{self.ejecution},{t},{MH_params},{current_time},{self.seed},{self.BKS},"{self.F_min}","{self.improve_percentage}"'
+                log = f'{self.num_function},{self.ejecution},{t},{MH_params},{current_time},{self.seed},{self.BKS},"{self.F_min}","{self.improve_percentage}"'
                 logs_writter.writerow(log.split(','))
                 print('\n' + log)
 
                 if t != 0:
                     if not original_MH:
                         # Se ajusta la cantidad de soluciones dependiendo del desempeño
-                        self.check_improve(past_best)
+                        self.check_improve(cluster_writter, past_best, t)
 
                     past_best = self.F_min
 
@@ -286,6 +310,7 @@ class CSO:
 
         # Se cierran los archivos
         logs_file.close()
+        clusters_file.close()
 
         return self.best, self.F_min
 

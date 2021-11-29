@@ -28,8 +28,12 @@ def main():
             N_Gen = 2500
             ObjetiveFunction = bench.get_function(num_function)
 
-            cuckoo = CSO(ObjetiveFunction, NP, D, pa, beta, Lower, Upper, N_Gen, ejecution, BKS)
-            cuckoo.execute(num_function, f'Logs/function{num_function}_{ejecution}.csv', ORIGINAL_MH)
+            name_ejecution_file = f'function{num_function}_{ejecution}.csv'
+            name_logs_file = 'Logs/' + name_ejecution_file
+            name_cluster_file = 'Logs/clusters/' + name_ejecution_file
+
+            cuckoo = CSO(ObjetiveFunction, NP, D, pa, beta, Lower, Upper, N_Gen, num_function, ejecution, BKS)
+            cuckoo.execute(name_logs_file, name_cluster_file, ORIGINAL_MH)
 
 
 def handle_args():
