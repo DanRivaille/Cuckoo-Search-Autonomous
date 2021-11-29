@@ -246,42 +246,46 @@ class CSO:
         '''
         Execute the Cuckoo Search Algorithm
         '''
-        self.init_cuckoo()
+        # Archivo de logs de la MH
+        logs_file = open(name_logs_file, mode='w')
 
+        self.init_cuckoo()
         past_best = self.F_min
 
-        with open(name_logs_file, mode='w') as logs_file:
-            initial_time = time.perf_counter()
-            logs_writter = csv.writer(logs_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-            logs_writter.writerow('function,ejecution,iteration,D,NP,N_Gen,pa,beta,lower,upper,time_ms,seed,BKS,fitness,%improvement'.split(','))
+        initial_time = time.perf_counter()
+        logs_writter = csv.writer(logs_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        logs_writter.writerow('function,ejecution,iteration,D,NP,N_Gen,pa,beta,lower,upper,time_ms,seed,BKS,fitness,%improvement'.split(','))
 
-            # Meteheuristic
-            for t in range(self.N_Gen + 1):
-                if (t % 100) == 0:
-                    # LUEGO DE ESTO, LAS LISTAS ESTAN ORDENADAS POR FITNESS
-                    self.sort_by_fitness()
-                    self.update_improve_percentage(past_best)
+        # Meteheuristic
+        for t in range(self.N_Gen + 1):
+            if (t % 100) == 0:
+                # LUEGO DE ESTO, LAS LISTAS ESTAN ORDENADAS POR FITNESS
+                self.sort_by_fitness()
+                self.update_improve_percentage(past_best)
 
-                    # Logs purposes
-                    MH_params = f'{self.D},{self.NP},{self.N_Gen},{self.pa},{self.beta}'
-                    MH_params += f',{self.Lower},{self.Upper}'
-                    current_time = parseSeconds(time.perf_counter() - initial_time)
-                    log = f'{n_fun},{self.ejecution},{t},{MH_params},{current_time},{self.seed},{self.BKS},"{self.F_min}","{self.improve_percentage}"'
-                    logs_writter.writerow(log.split(','))
-                    print('\n' + log)
+                # Logs purposes
+                MH_params = f'{self.D},{self.NP},{self.N_Gen},{self.pa},{self.beta}'
+                MH_params += f',{self.Lower},{self.Upper}'
+                current_time = parseSeconds(time.perf_counter() - initial_time)
+                log = f'{n_fun},{self.ejecution},{t},{MH_params},{current_time},{self.seed},{self.BKS},"{self.F_min}","{self.improve_percentage}"'
+                logs_writter.writerow(log.split(','))
+                print('\n' + log)
 
-                    if t != 0:
-                        if not original_MH:
-                            # Se ajusta la cantidad de soluciones dependiendo del desempeño
-                            self.check_improve(past_best)
+                if t != 0:
+                    if not original_MH:
+                        # Se ajusta la cantidad de soluciones dependiendo del desempeño
+                        self.check_improve(past_best)
 
-                        past_best = self.F_min
+                    past_best = self.F_min
 
-                self.update_position_1()
-                self.clip_X()       # Apply bounds
-                self.update_position_2()
-                self.clip_X()       # Apply bounds
+            self.update_position_1()
+            self.clip_X()       # Apply bounds
+            self.update_position_2()
+            self.clip_X()       # Apply bounds
 
+
+        # Se cierran los archivos
+        logs_file.close()
 
         return self.best, self.F_min
 
