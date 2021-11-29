@@ -93,7 +93,6 @@ class CSO:
                 quantity = info_clusters[label]['quantity']
 
                 cluster_logs = f'{self.seed},{self.num_function},{self.ejecution},{iteration},{cant_clusters},{min_value},{max_value},{quantity},{mean_cluster},{epsilon},{k},{label}'
-                print(cluster_logs)
                 clusters_writter.writerow(cluster_logs.split(','))
 
             # Sino se alcanzo el limite, se incrementa la poblacion de murcielagos
