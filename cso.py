@@ -34,6 +34,10 @@ class CSO:
         self.fitness = []
 
     def sort_by_fitness(self):
+        '''
+        Se ordenan las soluciones y las variables relacionadas con estas, a partir
+        del fitness
+        '''
         # Se empaquetan los datos, para que cada murcielago tenga sus datos juntos al ordenarlos
         l = list(zip(self.X, self.fitness))
 
@@ -48,14 +52,23 @@ class CSO:
         self.X = np.array(self.X)
 
     def calculate_percentage(self, past_best, new_best):
+        '''
+        Calcula un porcentaje de mejora a partir del mejor pasado y el mejor actual
+        '''
         current_difference = past_best - new_best
         percentage = (current_difference * 100) / past_best
         return percentage
 
     def update_improve_percentage(self, past_best):
+        '''
+        Actualiza el porcentaje de mejora
+        '''
         self.improve_percentage = self.calculate_percentage(past_best, self.fitness[0])
 
     def check_improve(self, clusters_writter, past_best, iteration):
+        '''
+        Aplica el autonomo
+        '''
         global INCREMENTS_NEST
         global INCREMENTS_NEST_PER_CLUSTER
 
@@ -85,6 +98,7 @@ class CSO:
             # Se obtiene la informacion de los clusters
             info_clusters = getInfoClusters(labels, self.fitness)
 
+            # VER getInfoClusters PARA VER EL FORMATO DE info_clusters
             # Se guardan los logs del cluster
             for label in unique_labels:
                 min_value = info_clusters[label]['min']
@@ -117,6 +131,9 @@ class CSO:
             self.best_nest()
 
     def best_nest(self):
+        '''
+        Busca y actualiza el mejor nido
+        '''
         j = 0
         for i in range(self.NP):
             if self.fitness[i] < self.fitness[j]:
@@ -126,12 +143,19 @@ class CSO:
         self.F_min = self.fitness[j]
 
     def add_new_nest(self, new_nest, index):
+        '''
+        Agrega un nuevo nido a la poblacion de soluciones
+        '''
         # Se ingresan los datos del nuevo muercielago
         self.X = np.append(self.X, [new_nest], axis=0)
         self.fitness.append(self.function(new_nest))
         self.NP += 1
 
     def increment_cluster(self, clusters):
+        '''
+        Se incrementa la poblacion de los clusters, agregando murcielagos generados
+        alrededor de los mejores de cada cluster
+        '''
         x_is_modified = False
         best_nest_clusters = {l: {'index': [], 'cant': 0} for l in np.unique(clusters.labels_)}
 
@@ -157,6 +181,9 @@ class CSO:
 
 
     def replace_cluster(self, clusters):
+        '''
+        Reemplaza la mitad mas mala de los clusters, con soluciones generadas aleatorias
+        '''
         # Diccionario que contiene la informacion para calcular el promedio de cada cluster.
         # Para cada cluster se puede acceder a su informacion por su label,
         # como valor guarda un diccionario para organizar su informacion
@@ -315,6 +342,9 @@ class CSO:
 
 
     def generate_local_solution(self, solution):
+        '''
+        Genera una solucion local a partir de la 'solution' ingresada
+        '''
         num = gamma(1+self.beta)*np.sin(np.pi*self.beta/2)
         den = gamma((1+self.beta)/2)*self.beta*(2**((self.beta-1)/2))
         σu = (num/den)**(1/self.beta)
@@ -330,6 +360,9 @@ class CSO:
 
 
     def generate_random_solution(self, solution):
+        '''
+        Genera una solucion aleatoria
+        '''
         Xnew = solution.copy()
         Xold = solution.copy()
 
